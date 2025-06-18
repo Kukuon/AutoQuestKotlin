@@ -37,6 +37,7 @@ class CreateOfferActivity : AppCompatActivity() {
 
     private var offerId: String? = null
 
+    //  список путей url картинок
     private val filePaths: MutableList<Uri?>? = ArrayList()
 
 
@@ -47,20 +48,24 @@ class CreateOfferActivity : AppCompatActivity() {
         )
         setContentView(binding!!.root)
 
+        // инициализация ссылки на firebase бд
         storageReference = FirebaseStorage.getInstance().getReference("uploads")
         usersRef = firebaseDatabase.getReference("users")
         offersRef = firebaseDatabase.getReference("offers")
+        // уникальный ключ генерируется для каждого оффера
         offerId = offersRef!!.push().key
-
+        // бинд кнопки выбора изображений для оффера
         binding!!.selectButton.setOnClickListener { v: View? -> selectImage() }
-
+        // бинд кнопки выгрузки оффера в firebase
         binding!!.uploadButton.setOnClickListener { v: View? ->
+
             uploadImage()
             uploadToDatabase()
             startActivity(Intent(this@CreateOfferActivity, MainActivity::class.java))
         }
     }
 
+    // функция запускающая выбор картинок из галереи на телефоне
     private fun selectImage() {
         val intent = Intent()
         intent.setType("image/")
@@ -72,24 +77,30 @@ class CreateOfferActivity : AppCompatActivity() {
         )
     }
 
+    // обработка результатов выбора картинок
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            // объект bitmap для сохранения картинок
             val bitmaps: MutableList<Bitmap> = ArrayList()
 
+            // если выбрано несколько
             if (data.clipData != null) {
                 val count = data.clipData!!.itemCount
                 for (i in 0 until count) {
                     val imageUri = data.clipData!!.getItemAt(i).uri
+                    // добавляем Uri в список
                     filePaths!!.add(imageUri)
                     try {
+                        // получаем Bitmap для отображения превью
                         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
                         bitmaps.add(bitmap)
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
                 }
+                // если выбрано одно изображение
             } else if (data.data != null) {
                 val imageUri = data.data
                 filePaths!!.add(imageUri)
@@ -100,31 +111,33 @@ class CreateOfferActivity : AppCompatActivity() {
                     e.printStackTrace()
                 }
             }
+            // показываем выбранные изображения в гриде
             displaySelectedImages(bitmaps)
         }
     }
 
+    // выводим изображения в GridView
     private fun displaySelectedImages(bitmaps: List<Bitmap>) {
         val adapter = AvatarAdapter(this, bitmaps)
         binding!!.imageGridView.adapter = adapter
     }
 
+    // выгрузка изображений в Firebase
     private fun uploadImage() {
         if (filePaths != null && !filePaths.isEmpty()) {
-            // Code for showing progressDialog while uploading
+            // прогресбар загрузки
             val progressDialog = ProgressDialog(this)
             progressDialog.setTitle("Uploading...")
             progressDialog.show()
 
             for (uri in filePaths) {
-                // Defining the child of storageReference
+                // создание пути для каждого файла для storage
                 val ref = storageReference!!.child(
                     "offer_images/" + offerId + "/" + UUID.randomUUID().toString()
                 )
-                // adding listeners on upload or failure of image
+                // загрузка и слушаем результат
                 ref.putFile(uri!!).addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot? ->
-                    // Image uploaded successfully
-                    // Dismiss dialog
+
                     progressDialog.dismiss()
                     Toast.makeText(
                         this@CreateOfferActivity,
@@ -132,7 +145,7 @@ class CreateOfferActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }.addOnFailureListener { e: Exception ->
-                    // Error, Image not uploaded
+
                     progressDialog.dismiss()
                     Toast.makeText(
                         this@CreateOfferActivity,
@@ -140,7 +153,7 @@ class CreateOfferActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }.addOnProgressListener { taskSnapshot: UploadTask.TaskSnapshot ->
-                    // Progress Listener for loading percentage on the dialog box
+                    // обновление диалога програссбара
                     val progress =
                         (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
                     progressDialog.setMessage("Uploaded " + progress.toInt() + "%")
@@ -149,7 +162,9 @@ class CreateOfferActivity : AppCompatActivity() {
         }
     }
 
+    //выгрузка остальных данных ( не изображений) в Firebase DATABASE (не firestore)
     private fun uploadToDatabase() {
+        // данные из полей ввода
         val brand = (findViewById<View>(R.id.brandET) as EditText).text.toString()
         val model = (findViewById<View>(R.id.modelET) as EditText).text.toString()
         val generation = (findViewById<View>(R.id.generationET) as EditText).text.toString()
@@ -162,6 +177,7 @@ class CreateOfferActivity : AppCompatActivity() {
 
         val ownerId = firebaseUser!!.uid
 
+        // получаем телефон владельца из базы чтобы добавить в объявление
         usersRef!!.child(ownerId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val ownerPhoneNumber = snapshot.child("phoneNumber").getValue(
@@ -182,7 +198,7 @@ class CreateOfferActivity : AppCompatActivity() {
                 )
 
                 if (offerId != null) {
-                    // Сохранение offer в базу данных Realtime Database
+                    // Сохранение оферв в базу данных Realtime Database
                     offersRef!!.child(offerId!!).setValue(item)
                         .addOnSuccessListener { aVoid: Void? ->
                             Toast.makeText(
@@ -190,7 +206,7 @@ class CreateOfferActivity : AppCompatActivity() {
                                 "Объявление добавлено",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            clearEditTextFields()
+                            clearEditTextFields() // очистка всех полей
                             startActivity(
                                 Intent(
                                     this@CreateOfferActivity,
@@ -208,11 +224,13 @@ class CreateOfferActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle possible errors.
+                // для ошибок
             }
         })
     }
 
+
+    // функция очистки всех полей ввода
     private fun clearEditTextFields() {
         (findViewById<View>(R.id.brandET) as EditText).setText("")
         (findViewById<View>(R.id.modelET) as EditText).setText("")

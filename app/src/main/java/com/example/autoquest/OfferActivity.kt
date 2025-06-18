@@ -40,7 +40,7 @@ class OfferActivity() : AppCompatActivity() {
 
 
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firebaseUser: FirebaseUser? = firebaseAuth.getCurrentUser()
+    private val firebaseUser: FirebaseUser? = firebaseAuth.currentUser
 
     private var parametersRef: DatabaseReference? = null
     private var userRef: DatabaseReference? = null
@@ -53,50 +53,50 @@ class OfferActivity() : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityOfferBinding.inflate(getLayoutInflater())
+        binding = ActivityOfferBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
         // Получение ID объявления
-        val offerId: String? = getIntent().getStringExtra("offerId")
+        val offerId: String? = intent.getStringExtra("offerId")
 
         // Инициализируем списки для изображений и параметров
         imageUrls = ArrayList()
 
-        binding!!.returnButton.setOnClickListener(View.OnClickListener({ v: View? ->
+        binding!!.returnButton.setOnClickListener(View.OnClickListener {
             startActivity(
                 Intent(
                     this@OfferActivity, MainActivity::class.java
                 )
             )
-        }))
-        binding!!.addFavoriteOfferButton.setOnClickListener(View.OnClickListener({ v: View? ->
+        })
+        binding!!.addFavoriteOfferButton.setOnClickListener(View.OnClickListener {
             toggleFavoriteOffer(
                 offerId
             )
-        }))
-        binding!!.deleteOfferButton.setOnClickListener(View.OnClickListener({ v: View? ->
+        })
+        binding!!.deleteOfferButton.setOnClickListener(View.OnClickListener {
             deleteOffer(
                 offerId
             )
-        }))
+        })
 
         loadOfferData(offerId)
 
         loadOfferImages(offerId)
 
-        binding!!.showPhoneButton.setOnClickListener(View.OnClickListener({ v: View? -> showPhoneNumberDialog() }))
+        binding!!.showPhoneButton.setOnClickListener(View.OnClickListener { showPhoneNumberDialog() })
     }
 
 
     private fun loadOfferData(offerId: String?) {
-        // Получение данных объявления
+        // получение данных объявления
         parametersRef = FirebaseDatabase.getInstance().getReference("offers").child((offerId)!!)
 
 
         parametersRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    // Получаем параметры из снимка данных
+                    // получаем параметры из снимка данных
                     val brand: String? = snapshot.child("brand").getValue(
                         String::class.java
                     )
@@ -130,10 +130,10 @@ class OfferActivity() : AppCompatActivity() {
 
                     val parameters: MutableList<Parameter> = ArrayList()
 
-                    // загрузка автарки владельца объявления
+                    // загрузка аватарки владельца объявления
                     loadUserAvatar(ownerId)
 
-                    // Создаем объекты параметров и добавляем их в список
+                    // создаем объекты параметров и добавляем их в список
                     parameters.add(Parameter("Бренд", brand))
                     parameters.add(Parameter("Модель", model))
                     parameters.add(Parameter("Поколение", generation))
@@ -141,13 +141,12 @@ class OfferActivity() : AppCompatActivity() {
                     parameters.add(Parameter("Мощность двигателя", enginePower))
                     parameters.add(Parameter("Расход топлива", fuelConsumption))
 
-
-
+                    // привязка текста к соответсвующим textView
                     binding!!.titleTV.setText(brand + " " + model + " " + generation)
                     binding!!.priceTV.setText(price + " ₽")
                     binding!!.descriptionTV.setText(description)
 
-                    // установка имени пользователя в объявлении
+                    // установка имени пользователя в объявлении, взтого из firebae databse
                     userRef =
                         FirebaseDatabase.getInstance().getReference("users").child((ownerId)!!)
                     userRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -165,17 +164,17 @@ class OfferActivity() : AppCompatActivity() {
 
                     if (firebaseUser != null) {
                         userRef1 = FirebaseDatabase.getInstance().getReference("users")
-                            .child(firebaseUser.getUid())
+                            .child(firebaseUser.uid)
                         userRef1!!.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 isAdmin = snapshot.child("isAdmin").getValue(String::class.java)
                                 if (isAdmin != null && (isAdmin == "true")) {
-                                    binding!!.deleteOfferButton.setVisibility(View.VISIBLE)
+                                    binding!!.deleteOfferButton.visibility = View.VISIBLE
                                 }
                             }
 
                             override fun onCancelled(error: DatabaseError) {
-                                binding!!.deleteOfferButton.setVisibility(View.GONE)
+                                binding!!.deleteOfferButton.visibility = View.GONE
                             }
                         })
                     }
@@ -183,9 +182,9 @@ class OfferActivity() : AppCompatActivity() {
 
                     val parametersGridView: GridView = findViewById(R.id.parametersGridView)
                     parameterAdapter = ParameterAdapter(this@OfferActivity, parameters)
-                    parametersGridView.setAdapter(parameterAdapter)
+                    parametersGridView.adapter = parameterAdapter
 
-                    // Уведомляем адаптер об изменениях
+                    // уведомляем адаптер об изменениях
                     parameterAdapter!!.notifyDataSetChanged()
                 }
             }
@@ -201,7 +200,7 @@ class OfferActivity() : AppCompatActivity() {
     private fun loadOfferImages(offerId: String?) {
         // Получение списка файлов изображений из Firebase Storage
         storageReferenceImages =
-            FirebaseStorage.getInstance().getReference("uploads/offer_images/" + offerId)
+            FirebaseStorage.getInstance().getReference("uploads/offer_images/$offerId")
         storageReferenceImages!!.listAll()
             .addOnSuccessListener(OnSuccessListener { listResult: ListResult ->
                 for (item: StorageReference in listResult.getItems()) {
@@ -245,24 +244,20 @@ class OfferActivity() : AppCompatActivity() {
         // Загружаем аватар в виде массива байт
         val ONE_MEGABYTE: Long = (1024 * 1024).toLong()
         storageReferenceAvatar!!.getBytes(ONE_MEGABYTE)
-            .addOnSuccessListener(object : OnSuccessListener<ByteArray> {
-                override fun onSuccess(bytes: ByteArray) {
-                    val bitmap: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    binding!!.avatarImageView.setImageBitmap(bitmap)
-                }
-            }).addOnFailureListener(object : OnFailureListener {
-            override fun onFailure(exception: Exception) {
-                // Обработка ошибки
+            .addOnSuccessListener { bytes ->
+                val bitmap: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                binding!!.avatarImageView.setImageBitmap(bitmap)
+            }.addOnFailureListener { // Обработка ошибки
                 Toast.makeText(
                     this@OfferActivity,
                     "Ошибка в загрузке фото профиля",
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        })
     }
 
 
+    // функция показа диаологового окна
     private fun showPhoneNumberDialog() {
         // Создаем билдер для AlertDialog
         val builder: AlertDialog.Builder = AlertDialog.Builder(
@@ -270,7 +265,7 @@ class OfferActivity() : AppCompatActivity() {
         )
 
         // Получаем LayoutInflater
-        val inflater: LayoutInflater = this.getLayoutInflater()
+        val inflater: LayoutInflater = this.layoutInflater
 
         // Создаем View для диалогового окна из пользовательского макета
         val dialogView: View = inflater.inflate(R.layout.dialog_confirmation, null)
@@ -279,8 +274,8 @@ class OfferActivity() : AppCompatActivity() {
         // Настраиваем содержимое диалогового окна
         val phoneTextView: TextView = dialogView.findViewById(R.id.dialog_phone_number)
         val title: TextView = dialogView.findViewById(R.id.dialog_title)
-        title.setText("Позвонить на номер?")
-        phoneTextView.setText(ownerPhoneNumber)
+        title.text = "Позвонить на номер?"
+        phoneTextView.text = ownerPhoneNumber
 
         val acceptButton: ImageButton = dialogView.findViewById(R.id.acceptButton)
         val cancelButton: ImageButton = dialogView.findViewById(R.id.cancelButton)
@@ -288,31 +283,25 @@ class OfferActivity() : AppCompatActivity() {
         // Создаем и показываем AlertDialog
         val dialog: AlertDialog = builder.create()
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow()!!.setBackgroundDrawableResource(android.R.color.transparent)
+        if (dialog.window != null) {
+            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
-        acceptButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View) {
-                try {
-                    val dialIntent: Intent = Intent(Intent.ACTION_DIAL)
-                    dialIntent.setData(Uri.parse("tel:" + ownerPhoneNumber))
-                    startActivity(dialIntent)
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        getApplicationContext(),
-                        "Не удалось совершить вызов",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+        acceptButton.setOnClickListener {
+            try {
+                val dialIntent: Intent = Intent(Intent.ACTION_DIAL)
+                dialIntent.setData(Uri.parse("tel:$ownerPhoneNumber"))
+                startActivity(dialIntent)
+            } catch (e: Exception) {
+                Toast.makeText(
+                    applicationContext,
+                    "Не удалось совершить вызов",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-        })
+        }
 
-        cancelButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View) {
-                dialog.dismiss()
-            }
-        })
+        cancelButton.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
@@ -323,31 +312,31 @@ class OfferActivity() : AppCompatActivity() {
             FirebaseDatabase.getInstance().getReference("offers")
         // Используем тот же путь, что и при загрузке изображений
         val storageReferenceImages: StorageReference =
-            FirebaseStorage.getInstance().getReference("uploads/offer_images/" + offerId)
+            FirebaseStorage.getInstance().getReference("uploads/offer_images/$offerId")
 
         // Удаляем все изображения оффера
         storageReferenceImages.listAll()
             .addOnSuccessListener(OnSuccessListener { listResult: ListResult ->
-                if (listResult.getItems().isEmpty()) {
+                if (listResult.items.isEmpty()) {
                     // Если нет файлов, сразу удаляем из базы данных
                     deleteFromDatabase(databaseReference, offerId)
                 } else {
                     // Счетчик для отслеживания успешных удалений
                     val deleteCount: IntArray = intArrayOf(0)
-                    val totalFiles: Int = listResult.getItems().size
+                    val totalFiles: Int = listResult.items.size
 
-                    for (item: StorageReference in listResult.getItems()) {
+                    for (item: StorageReference in listResult.items) {
                         item.delete().addOnSuccessListener(OnSuccessListener { aVoid: Void? ->
                             deleteCount[0]++
                             // Если все файлы удалены, удаляем из базы
-                            if (deleteCount.get(0) == totalFiles) {
+                            if (deleteCount[0] == totalFiles) {
                                 deleteFromDatabase(databaseReference, offerId)
                             }
                         }).addOnFailureListener(OnFailureListener { e: Exception? ->
                             Log.e("OfferActivity", "Ошибка удаления файла", e)
                             deleteCount[0]++
-                            // Продолжаем даже при ошибке удаления файла
-                            if (deleteCount.get(0) == totalFiles) {
+                            // Продолжаем и при ошибке удаления файла
+                            if (deleteCount[0] == totalFiles) {
                                 deleteFromDatabase(databaseReference, offerId)
                             }
                         })
@@ -355,38 +344,36 @@ class OfferActivity() : AppCompatActivity() {
                 }
             }).addOnFailureListener(OnFailureListener { e: Exception? ->
                 Log.e("OfferActivity", "Ошибка при получении списка файлов", e)
-                // Если не удалось получить список файлов, все равно пытаемся удалить из базы
+                // Если не удалось получить список файлов все равно пытаемся удалить
                 deleteFromDatabase(databaseReference, offerId)
             })
     }
 
-    // Функция для удаления из базы данных
+    // Функция для удаления оффера из базы данных
     private fun deleteFromDatabase(databaseReference: DatabaseReference, offerId: String?) {
         databaseReference.child((offerId)!!).removeValue()
-            .addOnSuccessListener(object : OnSuccessListener<Void?> {
-                override fun onSuccess(avoid: Void?) {
-                    Toast.makeText(
-                        this@OfferActivity,
-                        "Объявление успешно удалено",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    startActivity(Intent(this@OfferActivity, MainActivity::class.java))
-                }
-            }).addOnFailureListener(object : OnFailureListener {
-            override fun onFailure(e: Exception) {
+            .addOnSuccessListener {
+                // высплывающее уведомление
+                Toast.makeText(
+                    this@OfferActivity,
+                    "Объявление успешно удалено",
+                    Toast.LENGTH_SHORT
+                ).show()
+                // и возврат на исходное активитит
+                startActivity(Intent(this@OfferActivity, MainActivity::class.java))
+            }.addOnFailureListener { e ->
                 Toast.makeText(this@OfferActivity, "Ошибка удаления объявления", Toast.LENGTH_SHORT)
                     .show()
                 Log.e("OfferActivity", "Ошибка удаления объявления", e)
             }
-        })
     }
 
-
+// функция для доавления или удаления избранного
     private fun toggleFavoriteOffer(offerId: String?) {
         if (firebaseUser != null) {
             // Получаем ссылку на узел с избранными объявлениями пользователя
             userRef = FirebaseDatabase.getInstance().getReference("users")
-                .child((firebaseAuth.getUid())!!).child("favorites_offers")
+                .child((firebaseAuth.uid)!!).child("favorites_offers")
 
             // Добавляем слушатель для получения текущего состояния избранных объявлений
             userRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -445,6 +432,7 @@ class OfferActivity() : AppCompatActivity() {
                     }
                 }
 
+                // ошибка
                 override fun onCancelled(error: DatabaseError) {
                     Toast.makeText(
                         this@OfferActivity,

@@ -46,85 +46,77 @@ class SignUpActivity() : AppCompatActivity() {
         setContentView(binding!!.getRoot())
 
 
-        binding!!.avatarImageView.setOnClickListener(View.OnClickListener({ v: View? -> selectImage() }))
+        binding!!.avatarImageView.setOnClickListener(View.OnClickListener { selectImage() })
 
-        binding!!.acceptButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View) {
-                val email: String = binding!!.emailInput.getText().toString().trim({ it <= ' ' })
+        binding!!.acceptButton.setOnClickListener {
+            val email: String = binding!!.emailInput.text.toString().trim { it <= ' ' }
 
-                val password: String =
-                    binding!!.passwordInput.getText().toString().trim({ it <= ' ' })
-                val phoneNumber: String =
-                    binding!!.phoneInput.getText().toString().trim({ it <= ' ' })
-                val name: String = binding!!.nameInput.getText().toString().trim({ it <= ' ' })
+            val password: String =
+                binding!!.passwordInput.text.toString().trim { it <= ' ' }
+            val phoneNumber: String =
+                binding!!.phoneInput.text.toString().trim { it <= ' ' }
+            val name: String = binding!!.nameInput.text.toString().trim { it <= ' ' }
 
-                if (email.isEmpty()) {
-                    binding!!.emailInput.setError("E-mail не может быть пустым")
-                }
-                if (phoneNumber.isEmpty() || !validatePhoneNumber(phoneNumber)) {
-                    binding!!.phoneInput.setError("Номер телефона неверного формата")
-                }
-                if (name.isEmpty()) {
-                    binding!!.nameInput.setError("Имя не может быть пустым")
-                }
-                if (password.isEmpty()) {
-                    binding!!.passwordInput.setError("Пароль не может быть пустым")
-                } else {
-                    firebaseAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(object : OnCompleteListener<AuthResult> {
-                            override fun onComplete(task: Task<AuthResult>) {
-                                if (task.isSuccessful()) {
-                                    val user: FirebaseUser? = task.getResult()
-                                        .getUser() // Получение FirebaseUser из AuthResult
-                                    saveUserDataToDatabase(user!!.getUid(), phoneNumber, name)
+            if (email.isEmpty()) {
+                binding!!.emailInput.error = "E-mail не может быть пустым"
+            }
+            if (phoneNumber.isEmpty() || !validatePhoneNumber(phoneNumber)) {
+                binding!!.phoneInput.error = "Номер телефона неверного формата"
+            }
+            if (name.isEmpty()) {
+                binding!!.nameInput.error = "Имя не может быть пустым"
+            }
+            if (password.isEmpty()) {
+                binding!!.passwordInput.error = "Пароль не может быть пустым"
+            } else {
+                firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            // Получение FirebaseUser из AuthResult
+                            val user: FirebaseUser? = task.getResult().user
 
-                                    uploadImage()
+                            saveUserDataToDatabase(user!!.getUid(), phoneNumber, name)
 
+                            uploadImage()
+
+                            Toast.makeText(
+                                this@SignUpActivity,
+                                "Успешная регистрация",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            firebaseAuth.signInWithEmailAndPassword(email, password)
+                                .addOnSuccessListener {
+                                    startActivity(
+                                        Intent(
+                                            this@SignUpActivity,
+                                            MainActivity::class.java
+                                        )
+                                    )
+                                    finish()
+                                }.addOnFailureListener {
                                     Toast.makeText(
                                         this@SignUpActivity,
-                                        "Успешная регистрация",
+                                        "Не удалось войти",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    firebaseAuth.signInWithEmailAndPassword(email, password)
-                                        .addOnSuccessListener(object :
-                                            OnSuccessListener<AuthResult?> {
-                                            override fun onSuccess(authResult: AuthResult?) {
-                                                startActivity(
-                                                    Intent(
-                                                        this@SignUpActivity,
-                                                        MainActivity::class.java
-                                                    )
-                                                )
-                                                finish()
-                                            }
-                                        }).addOnFailureListener(object : OnFailureListener {
-                                        override fun onFailure(e: Exception) {
-                                            Toast.makeText(
-                                                this@SignUpActivity,
-                                                "Не удалось войти",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    })
-                                } else {
-                                    Toast.makeText(
-                                        this@SignUpActivity,
-                                        "Не удалось зарегистрироваться: " + task.getException()!!.message,
-                                        Toast.LENGTH_LONG
-                                    ).show()
                                 }
-                            }
-                        })
-                }
+                        } else {
+                            Toast.makeText(
+                                this@SignUpActivity,
+                                "Не удалось зарегистрироваться: " + task.exception!!.message,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
             }
-        })
-        binding!!.loginButton.setOnClickListener(View.OnClickListener({ v: View? ->
+        }
+        binding!!.loginButton.setOnClickListener(View.OnClickListener {
             startActivity(
                 Intent(
                     this@SignUpActivity, LoginActivity::class.java
                 )
             )
-        }))
+        })
     }
 
     private fun selectImage() {
@@ -143,13 +135,13 @@ class SignUpActivity() : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         // checking request code and result code, if request code is PICK_IMAGE_REQUEST and
         // resultCode is RESULT_OK, then set image in the image view
-        if ((requestCode == PICK_IMAGE_REQUEST) && (resultCode == RESULT_OK) && (data != null) && (data.getData() != null)) {
+        if ((requestCode == PICK_IMAGE_REQUEST) && (resultCode == RESULT_OK) && (data != null) && (data.data != null)) {
             // Get the Uri of data
-            filePath = data.getData()
+            filePath = data.data
             try {
                 // Setting image on image view using Bitmap
                 val bitmap: Bitmap =
-                    MediaStore.Images.Media.getBitmap(getContentResolver(), filePath)
+                    MediaStore.Images.Media.getBitmap(contentResolver, filePath)
                 binding!!.avatarImageView.setImageBitmap(bitmap)
             } catch (e: IOException) {
                 // Log the exception
@@ -171,30 +163,23 @@ class SignUpActivity() : AppCompatActivity() {
             // adding listeners on upload
             // or failure of image
             ref.putFile(filePath!!)
-                .addOnSuccessListener(object : OnSuccessListener<UploadTask.TaskSnapshot?> {
-                    override fun onSuccess(taskSnapshot: UploadTask.TaskSnapshot?) {
-                        // Image uploaded successfully
-                        // Dismiss dialog
-                        progressDialog.dismiss()
-                        Toast.makeText(this@SignUpActivity, "Image Uploaded!!", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }).addOnFailureListener(object : OnFailureListener {
-                override fun onFailure(e: Exception) {
-                    // Error, Image not uploaded
+                .addOnSuccessListener { // Image uploaded successfully
+                    // Dismiss dialog
+                    progressDialog.dismiss()
+                    Toast.makeText(this@SignUpActivity, "Image Uploaded!!", Toast.LENGTH_SHORT)
+                        .show()
+                }.addOnFailureListener { e -> // Error, Image not uploaded
                     progressDialog.dismiss()
                     Toast.makeText(this@SignUpActivity, "Failed " + e.message, Toast.LENGTH_SHORT)
                         .show()
-                }
-            }).addOnProgressListener(object : OnProgressListener<UploadTask.TaskSnapshot> {
-                // Progress Listener for loading
-                // percentage on the dialog box
-                override fun onProgress(taskSnapshot: UploadTask.TaskSnapshot) {
+                }.addOnProgressListener { taskSnapshot ->
+
+                    // Progress Listener for loading
+                    // percentage on the dialog box
                     val progress: Double =
-                        (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount())
+                        (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
                     progressDialog.setMessage("Uploaded " + (progress.toInt()) + "%")
                 }
-            })
         }
     }
 

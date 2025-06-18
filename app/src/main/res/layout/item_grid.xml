@@ -8,7 +8,8 @@
     app:cardCornerRadius="20dp"
     android:backgroundTint="@color/color_bottom_bar"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:layout_margin="5dp">
 
     <LinearLayout
         android:layout_width="match_parent"

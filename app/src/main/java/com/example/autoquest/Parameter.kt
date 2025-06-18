@@ -1,6 +1,7 @@
 package com.example.autoquest
 
 class Parameter {
+    // поля отдельного параметра в офере
     var name: String? = null
     var value: String? = null
 

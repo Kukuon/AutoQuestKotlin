@@ -1,6 +1,8 @@
 package com.example.autoquest
 
 class Offer {
+    // поля офера
+    // геттеры сеттеры автоматом
     var offerId: String? = null
     var brand: String? = null
     var model: String? = null
@@ -14,7 +16,7 @@ class Offer {
     var ownerPhoneNumber: String? = null
     private val imageUrls: List<String>? = null
 
-    constructor()
+    constructor() // нужен, иначе вылетает
 
     // конструктор для карточки объявления на главном экране
     constructor(
