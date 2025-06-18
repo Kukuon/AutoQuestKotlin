@@ -43,7 +43,7 @@ class FavoritesFragment : Fragment() {
                 .child(firebaseUser.uid)
                 .child("favorites_offers")
             loadFavoriteOffers()
-// gfg
+
             return binding!!.root
         } else {
             val rootView = inflater.inflate(R.layout.fragment_unlogged, container, false)

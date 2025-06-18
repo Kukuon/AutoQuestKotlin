@@ -20,15 +20,13 @@ class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
 
     private val databaseReference = FirebaseDatabase.getInstance().getReference("offers")
-    private var gridAdapter: GridAdapter? = null
-    private val offerList: MutableList<Offer> = ArrayList()
     private val firebaseUser = FirebaseAuth.getInstance().currentUser
 
+    private var gridAdapter: GridAdapter? = null
+    private val offerList: MutableList<Offer> = ArrayList()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         gridAdapter = GridAdapter(activity, ArrayList())
@@ -53,6 +51,7 @@ class HomeFragment : Fragment() {
     }
 
 
+    // загрузка офферов из firebase
     private fun loadOffers() {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -63,6 +62,7 @@ class HomeFragment : Fragment() {
                         offerList.add(offer)
                     }
                 }
+                // передача офферов в адаптер
                 gridAdapter!!.updateOffers(offerList)
             }
 
