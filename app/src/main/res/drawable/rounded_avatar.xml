@@ -1,0 +1,16 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Квадратный фон -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_bottom_bar" /> <!-- Цвет фона -->
+        </shape>
+    </item>
+    <!-- Круглый вырез -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" /> <!-- Прозрачный цвет -->
+            <size android:width="100dp" android:height="100dp" /> <!-- Размер круга -->
+            <stroke android:width="2dp" android:color="#000000" /> <!-- Граница круга -->
+        </shape>
+    </item>
+</layer-list>

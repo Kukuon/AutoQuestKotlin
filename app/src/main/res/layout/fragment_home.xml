@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeFragment"
+    android:background="@color/color_main">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:clickable="true"
+        app:srcCompat="@drawable/plus_large_svg"
+        android:contentDescription="Добавить объявление"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="16dp"
+        tools:ignore="RelativeOverlap" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gridOffers"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:numColumns="2"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:padding="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:scrollbars="none">
+    </androidx.recyclerview.widget.RecyclerView>
+</RelativeLayout>

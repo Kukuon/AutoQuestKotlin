@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "201922854124",
+    "firebase_url": "https://autoquest-a8233-default-rtdb.europe-west1.firebasedatabase.app/",
+    "project_id": "autoquest-a8233",
+    "storage_bucket": "autoquest-a8233.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:201922854124:android:7d438f2229ac2bc045b9c9",
+        "android_client_info": {
+          "package_name": "com.example.autoquest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5pCQoc1AbFeK71lkdV7B37yrSJmhIOk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_main"
+    android:gravity="center"
+    android:orientation="vertical">
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/no_user_svg" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/not_loginned"
+        android:textAlignment="center"
+        android:fontFamily="@font/rubik_medium"
+        android:textSize="25sp"
+        android:layout_margin="20dp"
+        android:textColor="@color/white"/>
+    <Button
+        android:id="@+id/goToLoginButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:textSize="17sp"
+        android:text="@string/enter1"
+        android:backgroundTint="@android:color/holo_blue_dark"/>
+</LinearLayout>

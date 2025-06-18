@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/grid"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_main"
+    android:padding="5dp">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/color_bottom_bar"
+        app:titleTextColor="@color/white"
+        android:gravity="center"
+        android:elevation="4dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ImageButton
+                android:id="@+id/returnButton"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:layout_marginStart="5dp"
+                android:contentDescription="Вернуться"
+                android:scaleType="fitCenter"
+                android:src="@drawable/back1_svg"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/new_offer"
+                android:fontFamily="@font/rubik_medium"
+                android:textColor="@color/white"
+                android:layout_marginStart="5dp"
+                android:textSize="20sp" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:layout_below="@id/toolbar">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/brandET"
+                android:hint="@string/brand"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="textPersonName"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/modelET"
+                android:hint="Модель"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="textPersonName"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/generationET"
+                android:hint="Поколение"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="number"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/yearET"
+                android:hint="Год выпуска"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="number"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/descriptionET"
+                android:hint="Описание"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="text"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/priceET"
+                android:hint="Цена"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="number"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/enginePowerET"
+                android:hint="Мощность"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="number"
+                android:background="@drawable/custom_edittext"/>
+
+            <EditText
+                android:id="@+id/fuelConsumptionET"
+                android:hint="Средний расход"
+                android:fontFamily="@font/rubik_light"
+                android:layout_margin="20dp"
+                android:textColorHint="@color/white"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:inputType="number"
+                android:background="@drawable/custom_edittext"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Photos"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/rubik_light"
+                    android:textColor="@color/white"
+                    android:textSize="25sp"
+                    android:padding="20dp"/>
+                <Button
+                    android:id="@+id/selectButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/choose_images"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@android:color/holo_blue_dark"/>
+            </LinearLayout>
+
+            <GridView
+                android:id="@+id/imageGridView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="2"/>
+
+            <ImageButton
+                android:id="@+id/uploadButton"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@drawable/rounded_button_background"
+                android:src="@drawable/check_svg"
+                android:scaleType="fitCenter"
+                android:layout_margin="10dp"
+                android:layout_columnWeight="1"
+                android:contentDescription="@string/upload"/>
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

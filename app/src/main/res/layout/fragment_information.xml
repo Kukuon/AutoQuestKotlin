@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InformationActivity"
+    android:orientation="vertical"
+    android:background="@color/color_main">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/dark_grey"
+        app:titleTextColor="@color/white"
+        android:gravity="center"
+        android:elevation="4dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/returnButton"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:layout_marginStart="5dp"
+                android:contentDescription="Вернуться"
+                android:scaleType="fitCenter"
+                android:src="@drawable/back1_svg"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/information"
+                android:fontFamily="@font/rubik_medium"
+                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:paddingStart="10dp"
+                android:drawablePadding="10dp"
+                tools:ignore="RtlSymmetry" />
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:cardCornerRadius="60dp"
+                    android:layout_margin="10dp">
+                    <ImageView
+                        android:id="@+id/avatarImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/car_side_svgrepo_com"
+                        android:background="@color/color_main"
+                        android:contentDescription="Аватар" />
+                </androidx.cardview.widget.CardView>
+
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/dark_grey"
+                android:padding="10dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="О разработчике"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/rubik_medium"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:text="@string/developer_name"
+                        android:textSize="17sp"
+                        android:drawablePadding="5dp"
+                        android:padding="10dp"
+                        app:drawableLeftCompat="@drawable/user_svg" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#4d4d4d"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:text="@string/studentGroup"
+                        android:textSize="17sp"
+                        android:drawablePadding="5dp"
+                        android:padding="10dp"
+                        app:drawableLeftCompat="@drawable/group_svgrepo_com__1_" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#4d4d4d"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"/>
+
+                    <TextView
+                        android:id="@+id/emailTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:text="@string/developer_email"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:drawablePadding="5dp"
+                        android:padding="10dp"
+                        app:drawableLeftCompat="@drawable/mail" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#4d4d4d"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"/>
+
+                    <TextView
+                        android:id="@+id/passwordTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/development_year"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:drawablePadding="5dp"
+                        android:padding="10dp"
+                        app:drawableLeftCompat="@drawable/calendar_lines_svgrepo_com" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/dark_grey"
+                android:padding="10dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/about_program"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/rubik_medium"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="fill_horizontal"
+                        android:text="@string/program_description"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/rubik_light"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/dark_grey"
+                android:padding="10dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/usage_instraction"
+                        android:layout_marginStart="5dp"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/rubik_medium"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="fill_horizontal"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:text="jo"
+                        android:fontFamily="@font/rubik_light"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

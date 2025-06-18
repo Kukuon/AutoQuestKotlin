@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ProfileFragment"
+    android:background="@color/color_main">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@color/dark_grey"
+        app:titleTextColor="@color/white"
+        android:gravity="center"
+        android:elevation="4dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/profile"
+                android:fontFamily="@font/rubik_medium"
+                android:textColor="@color/white"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:drawableLeft="@drawable/user_svg"
+                android:paddingStart="10dp"
+                android:drawablePadding="10dp"/>
+
+
+            <ImageButton
+                android:id="@+id/exitButton"
+                android:layout_gravity="center"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="5dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/exit_svgrepo_com"
+                android:scaleType="fitCenter"
+                android:contentDescription="Выйти"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/toolbar">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            app:cardCornerRadius="60dp"
+            android:layout_margin="10dp">
+            <ImageView
+                android:id="@+id/avatarImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/image_square_xmark_svgrepo_com"
+                android:background="@color/color_main"
+                android:contentDescription="Аватар"
+                android:clickable="true"
+                android:focusable="true"/>
+        </androidx.cardview.widget.CardView>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/usernameTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="25sp"/>
+            <ImageButton
+                android:id="@+id/changeNameButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/edit_pencil_01_svgrepo_com"
+                android:contentDescription="Изменить имя" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/idTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#949494"
+            android:layout_marginBottom="10dp"/>
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            android:layout_margin="5dp"
+            android:backgroundTint="@color/dark_grey"
+            android:padding="10dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="5dp">
+                <TextView
+                    android:id="@+id/phoneTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:drawableLeft="@drawable/phone"
+                    android:drawablePadding="5dp"
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#4d4d4d"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"/>
+
+                <TextView
+                    android:id="@+id/emailTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:drawableLeft="@drawable/mail"
+                    android:drawablePadding="5dp"
+                    android:padding="10dp" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#4d4d4d"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"/>
+
+                <TextView
+                    android:id="@+id/passwordTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="**********"
+                    android:textStyle="bold"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:drawableLeft="@drawable/baseline_lock_24"
+                    android:drawablePadding="5dp"
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <Button
+            android:id="@+id/myOffersButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/link_color"
+            android:text="@string/my_offers"/>
+    </LinearLayout>
+
+
+</RelativeLayout>
