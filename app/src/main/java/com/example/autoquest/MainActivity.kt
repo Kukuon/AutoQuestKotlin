@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.example.autoquest.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationBarView
 
-class MainActivity() : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
 
@@ -21,16 +21,22 @@ class MainActivity() : AppCompatActivity() {
 
         // переключение фрагментов
         binding!!.bottomBar.setOnItemSelectedListener { item: MenuItem ->
-            if (item.itemId == R.id.search) {
-                replaceFragment(SearchFragment())
-            } else if (item.itemId == R.id.favorites) {
-                replaceFragment(FavoritesFragment())
-            } else if (item.itemId == R.id.home) {
-                replaceFragment(HomeFragment())
-            } else if (item.itemId == R.id.info) {
-                replaceFragment(InformationFragment())
-            } else if (item.itemId == R.id.profile) {
-                replaceFragment(ProfileFragment())
+            when (item.itemId) {
+                R.id.search -> {
+                    replaceFragment(SearchFragment())
+                }
+                R.id.favorites -> {
+                    replaceFragment(FavoritesFragment())
+                }
+                R.id.home -> {
+                    replaceFragment(HomeFragment())
+                }
+                R.id.info -> {
+                    replaceFragment(InformationFragment())
+                }
+                R.id.profile -> {
+                    replaceFragment(ProfileFragment())
+                }
             }
             true
         }

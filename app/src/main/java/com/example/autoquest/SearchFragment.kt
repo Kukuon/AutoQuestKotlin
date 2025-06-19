@@ -17,7 +17,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.Locale
 
-class SearchFragment() : Fragment() {
+class SearchFragment : Fragment() {
     private val databaseReference: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("offers")
     private var gridAdapter: GridAdapter? = null
@@ -33,23 +33,23 @@ class SearchFragment() : Fragment() {
 
         val searchView: SearchView = view.findViewById(R.id.searchView)
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView.setLayoutManager(GridLayoutManager(getContext(), 2))
+        recyclerView.setLayoutManager(GridLayoutManager(context, 2))
 
         // Инициализируем адаптер с пустым списком
-        gridAdapter = GridAdapter(getContext(), ArrayList())
+        gridAdapter = GridAdapter(context, ArrayList())
         recyclerView.setAdapter(gridAdapter)
 
         loadOffersFromFirebase()
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                Log.d(TAG, "Query submitted: " + query)
+                Log.d(TAG, "Query submitted: $query")
                 filterOffers(query)
                 return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                Log.d(TAG, "Query changed: " + newText)
+                Log.d(TAG, "Query changed: $newText")
                 filterOffers(newText)
                 return true
             }
@@ -58,6 +58,7 @@ class SearchFragment() : Fragment() {
         return view
     }
 
+    // загрузка оффером из бд
     private fun loadOffersFromFirebase() {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -65,7 +66,7 @@ class SearchFragment() : Fragment() {
                 for (snapshot: DataSnapshot in dataSnapshot.getChildren()) {
                     val offer: Offer? = snapshot.getValue(Offer::class.java)
                     if (offer != null) {
-                        offer.offerId = snapshot.getKey();
+                        offer.offerId = snapshot.key;
                         offerList.add(offer)
                         Log.d(TAG, "Loaded offer: " + offer.brand + " " + offer.model)
                     }
@@ -79,20 +80,22 @@ class SearchFragment() : Fragment() {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.e(TAG, "Failed to load offers", databaseError.toException())
-                Toast.makeText(getContext(), "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
+
+    // поиск по названию офферов
     private fun filterOffers(query: String?) {
-        Log.d(TAG, "Filtering with query: " + query)
+        Log.d(TAG, "Filtering with query: $query")
 
         filteredList.clear()
 
-        if (query == null || query.trim({ it <= ' ' }).isEmpty()) {
+        if (query == null || query.trim { it <= ' ' }.isEmpty()) {
             filteredList.addAll(offerList)
         } else {
-            val lowerCaseQuery: String = query.lowercase(Locale.getDefault()).trim({ it <= ' ' })
+            val lowerCaseQuery: String = query.lowercase(Locale.getDefault()).trim { it <= ' ' }
             for (offer: Offer in offerList) {
                 val matches: Boolean = ((offer.brand) != null && offer.brand!!.lowercase(
                     Locale.getDefault()
@@ -112,6 +115,7 @@ class SearchFragment() : Fragment() {
         updateAdapter()
     }
 
+    // обновление данных адаптера
     private fun updateAdapter() {
         if (gridAdapter != null) {
             gridAdapter!!.updateOffers(filteredList)
@@ -121,6 +125,6 @@ class SearchFragment() : Fragment() {
     }
 
     companion object {
-        private val TAG: String = "SearchFragment"
+        private const val TAG: String = "SearchFragment"
     }
 }

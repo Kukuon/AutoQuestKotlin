@@ -48,7 +48,7 @@ class GridAdapter(private val context: Context?, private var offerList: MutableL
         val storageReference =
             FirebaseStorage.getInstance().getReference("uploads/offer_images/" + offer.offerId)
         storageReference.listAll().addOnSuccessListener { listResult: ListResult ->
-            if (!listResult.items.isEmpty()) {
+            if (listResult.items.isNotEmpty()) {
                 val firstImageRef = listResult.items[0]
                 firstImageRef.downloadUrl.addOnSuccessListener { url: Uri? ->
                     Glide.with(
@@ -59,17 +59,17 @@ class GridAdapter(private val context: Context?, private var offerList: MutableL
                         .error(R.drawable.image_svg)
                         .centerCrop()
                         .into(holder.imageView)
-                }.addOnFailureListener { e: Exception? ->
+                }.addOnFailureListener {
                     holder.imageView.setImageResource(R.drawable.image_svg)
                 }
             } else {
                 holder.imageView.setImageResource(R.drawable.image_svg)
             }
-        }.addOnFailureListener { e: Exception? ->
+        }.addOnFailureListener {
             holder.imageView.setImageResource(R.drawable.image_svg)
         }
 
-        holder.itemView.setOnClickListener { v: View? ->
+        holder.itemView.setOnClickListener {
             val selectedOffer = offerList[position]
             val intent = Intent(context, OfferActivity::class.java)
             intent.putExtra("offerId", selectedOffer.offerId)

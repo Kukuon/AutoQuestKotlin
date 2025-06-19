@@ -33,7 +33,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 
-class ProfileFragment() : Fragment() {
+class ProfileFragment : Fragment() {
     // объекты текущего пользователя
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firebaseUser: FirebaseUser? = firebaseAuth.currentUser
@@ -215,15 +215,15 @@ class ProfileFragment() : Fragment() {
             dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
-        acceptButton.setOnClickListener { v: View? ->
+        acceptButton.setOnClickListener {
             if (firebaseUser != null) {
-                val intent: Intent = getActivity()!!.intent
+                val intent: Intent = requireActivity().intent
                 when (mode) {
                     0 -> {
                         // выход из профиля
                         firebaseAuth.signOut()
                         dialog.dismiss()
-                        getActivity()!!.finish()
+                        requireActivity().finish()
                         startActivity(intent)
                     }
 

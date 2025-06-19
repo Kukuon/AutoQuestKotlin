@@ -18,7 +18,7 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 
-class LoginActivity() : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private var binding: ActivityLoginBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,51 +29,48 @@ class LoginActivity() : AppCompatActivity() {
         val emailInput = binding!!.emailInput
         val passwordInput = binding!!.passwordInput
 
-        binding!!.acceptButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View) {
+        binding!!.acceptButton.setOnClickListener {
+            val email = emailInput.text.toString()
+            val password = passwordInput.text.toString()
 
-                val email = emailInput.text.toString()
-                val password = passwordInput.text.toString()
-
-                // вход
-                // проверка почты на правильность
-                if (email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    if (password.isNotEmpty()) {
-                        firebaseAuth.signInWithEmailAndPassword(email, password)
-                            .addOnSuccessListener {
-                                Toast.makeText(
+            // вход
+            // проверка почты на правильность
+            if (email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                if (password.isNotEmpty()) {
+                    firebaseAuth.signInWithEmailAndPassword(email, password)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Успешный вход " + firebaseAuth.currentUser!!
+                                    .email,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            startActivity(
+                                Intent(
                                     this@LoginActivity,
-                                    "Успешный вход " + firebaseAuth.currentUser!!
-                                        .email,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                startActivity(
-                                    Intent(
-                                        this@LoginActivity,
-                                        MainActivity::class.java
-                                    )
+                                    MainActivity::class.java
                                 )
-                                finish()
-                            }.addOnFailureListener {
-                                Toast.makeText(
-                                    this@LoginActivity,
-                                    "Не удалось войти",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                    } else {
-                        // пустой пароль
-                        passwordInput.error = "Пароль не может быть пустым"
-                    }
-                } else if (email.isEmpty()) {
-                    // пустая почта
-                    emailInput.error = "Почта не может быть пустой"
+                            )
+                            finish()
+                        }.addOnFailureListener {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Не удалось войти",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                 } else {
-                    // почта неправильная
-                    emailInput.error = "Пожалуйста, введите почту правильно"
+                    // пустой пароль
+                    passwordInput.error = "Пароль не может быть пустым"
                 }
+            } else if (email.isEmpty()) {
+                // пустая почта
+                emailInput.error = "Почта не может быть пустой"
+            } else {
+                // почта неправильная
+                emailInput.error = "Пожалуйста, введите почту правильно"
             }
-        })
+        }
         // кнопка продолжить без аккаунта
         binding!!.continueWithoutAccountButton.setOnClickListener {
             startActivity(

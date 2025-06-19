@@ -30,25 +30,31 @@ import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class SignUpActivity() : AppCompatActivity() {
+class SignUpActivity : AppCompatActivity() {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val storageReference: StorageReference =
         FirebaseStorage.getInstance().getReference("uploads")
 
     private val PICK_IMAGE_REQUEST: Int = 22
+    // путь uri
     private var filePath: Uri? = null
 
     private var binding: ActivitySignupBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivitySignupBinding.inflate(getLayoutInflater())
+        binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
 
-        binding!!.avatarImageView.setOnClickListener(View.OnClickListener { selectImage() })
+        // привязка макетов к объектам
+        binding!!.avatarImageView.setOnClickListener { selectImage() }
 
+
+        // кнопка подтверждения
         binding!!.acceptButton.setOnClickListener {
+
+            // получение данных из полей ввода
             val email: String = binding!!.emailInput.text.toString().trim { it <= ' ' }
 
             val password: String =
@@ -57,6 +63,8 @@ class SignUpActivity() : AppCompatActivity() {
                 binding!!.phoneInput.text.toString().trim { it <= ' ' }
             val name: String = binding!!.nameInput.text.toString().trim { it <= ' ' }
 
+
+            // если пусто поле -> ошибка
             if (email.isEmpty()) {
                 binding!!.emailInput.error = "E-mail не может быть пустым"
             }
@@ -69,14 +77,17 @@ class SignUpActivity() : AppCompatActivity() {
             if (password.isEmpty()) {
                 binding!!.passwordInput.error = "Пароль не может быть пустым"
             } else {
+
+                // создание пользователя
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             // Получение FirebaseUser из AuthResult
-                            val user: FirebaseUser? = task.getResult().user
+                            val user: FirebaseUser? = task.result.user
 
-                            saveUserDataToDatabase(user!!.getUid(), phoneNumber, name)
+                            saveUserDataToDatabase(user!!.uid, phoneNumber, name)
 
+                            // выгрузка аватара
                             uploadImage()
 
                             Toast.makeText(
@@ -84,6 +95,7 @@ class SignUpActivity() : AppCompatActivity() {
                                 "Успешная регистрация",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            // вход в аккаунт сразу после регистрации
                             firebaseAuth.signInWithEmailAndPassword(email, password)
                                 .addOnSuccessListener {
                                     startActivity(
@@ -110,18 +122,21 @@ class SignUpActivity() : AppCompatActivity() {
                     }
             }
         }
-        binding!!.loginButton.setOnClickListener(View.OnClickListener {
+
+        // кнопк перехода на страницу входа
+        binding!!.loginButton.setOnClickListener {
             startActivity(
                 Intent(
                     this@SignUpActivity, LoginActivity::class.java
                 )
             )
-        })
+        }
     }
 
+    // функция выбора изображений для автара
     private fun selectImage() {
         // Defining Implicit Intent to mobile gallery
-        val intent: Intent = Intent()
+        val intent = Intent()
         intent.setType("image/*")
         intent.setAction(Intent.ACTION_GET_CONTENT)
         startActivityForResult(
@@ -131,40 +146,38 @@ class SignUpActivity() : AppCompatActivity() {
     }
 
 
+    // обработка выбора изображений
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // checking request code and result code, if request code is PICK_IMAGE_REQUEST and
-        // resultCode is RESULT_OK, then set image in the image view
         if ((requestCode == PICK_IMAGE_REQUEST) && (resultCode == RESULT_OK) && (data != null) && (data.data != null)) {
-            // Get the Uri of data
+            // получение uri данных
             filePath = data.data
             try {
-                // Setting image on image view using Bitmap
+                // через bitmap устанавливаем картинку на view
                 val bitmap: Bitmap =
                     MediaStore.Images.Media.getBitmap(contentResolver, filePath)
                 binding!!.avatarImageView.setImageBitmap(bitmap)
             } catch (e: IOException) {
-                // Log the exception
                 e.printStackTrace()
             }
         }
     }
 
+    // функция выгрузки изображений
     private fun uploadImage() {
         if (filePath != null) {
-            // Code for showing progressDialog while uploading
+            // прогрессбар
+
             val progressDialog: ProgressDialog = ProgressDialog(this)
             progressDialog.setTitle("Uploading...")
             progressDialog.show()
-            // Defining the child of storageReference
-            val ref: StorageReference =
-                storageReference.child("user_avatars/" + firebaseAuth.getUid())
 
-            // adding listeners on upload
-            // or failure of image
+            val ref: StorageReference =
+                storageReference.child("user_avatars/" + firebaseAuth.uid)
+
+            // добавление слушетелей на выгрузку или ошибку
             ref.putFile(filePath!!)
-                .addOnSuccessListener { // Image uploaded successfully
-                    // Dismiss dialog
+                .addOnSuccessListener {
                     progressDialog.dismiss()
                     Toast.makeText(this@SignUpActivity, "Image Uploaded!!", Toast.LENGTH_SHORT)
                         .show()
@@ -173,9 +186,7 @@ class SignUpActivity() : AppCompatActivity() {
                     Toast.makeText(this@SignUpActivity, "Failed " + e.message, Toast.LENGTH_SHORT)
                         .show()
                 }.addOnProgressListener { taskSnapshot ->
-
-                    // Progress Listener for loading
-                    // percentage on the dialog box
+                    // проценты на прогрессбаре
                     val progress: Double =
                         (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
                     progressDialog.setMessage("Uploaded " + (progress.toInt()) + "%")

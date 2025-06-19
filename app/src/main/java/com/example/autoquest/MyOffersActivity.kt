@@ -15,7 +15,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class MyOffersActivity() : AppCompatActivity() {
+class MyOffersActivity : AppCompatActivity() {
     private val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private var binding: ActivityMyOffersBinding? = null
     private var userOffers: MutableList<Offer>? = null

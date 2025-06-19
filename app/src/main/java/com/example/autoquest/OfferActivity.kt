@@ -30,7 +30,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ListResult
 import com.google.firebase.storage.StorageReference
 
-class OfferActivity() : AppCompatActivity() {
+class OfferActivity : AppCompatActivity() {
     var binding: ActivityOfferBinding? = null
 
     private var imageUrls: MutableList<String>? = null
@@ -62,29 +62,20 @@ class OfferActivity() : AppCompatActivity() {
         // Инициализируем списки для изображений и параметров
         imageUrls = ArrayList()
 
-        binding!!.returnButton.setOnClickListener(View.OnClickListener {
+        binding!!.returnButton.setOnClickListener {
             startActivity(
                 Intent(
                     this@OfferActivity, MainActivity::class.java
                 )
             )
-        })
-        binding!!.addFavoriteOfferButton.setOnClickListener(View.OnClickListener {
-            toggleFavoriteOffer(
-                offerId
-            )
-        })
-        binding!!.deleteOfferButton.setOnClickListener(View.OnClickListener {
-            deleteOffer(
-                offerId
-            )
-        })
+        }
+        binding!!.addFavoriteOfferButton.setOnClickListener { toggleFavoriteOffer(offerId) }
+        binding!!.deleteOfferButton.setOnClickListener { deleteOffer(offerId) }
 
         loadOfferData(offerId)
-
         loadOfferImages(offerId)
 
-        binding!!.showPhoneButton.setOnClickListener(View.OnClickListener { showPhoneNumberDialog() })
+        binding!!.showPhoneButton.setOnClickListener { showPhoneNumberDialog() }
     }
 
 
@@ -142,19 +133,17 @@ class OfferActivity() : AppCompatActivity() {
                     parameters.add(Parameter("Расход топлива", fuelConsumption))
 
                     // привязка текста к соответсвующим textView
-                    binding!!.titleTV.setText(brand + " " + model + " " + generation)
-                    binding!!.priceTV.setText(price + " ₽")
-                    binding!!.descriptionTV.setText(description)
+                    binding!!.titleTV.text = brand + " " + model + " " + generation
+                    binding!!.priceTV.text = price + " ₽"
+                    binding!!.descriptionTV.text = description
 
                     // установка имени пользователя в объявлении, взтого из firebae databse
                     userRef =
                         FirebaseDatabase.getInstance().getReference("users").child((ownerId)!!)
                     userRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            binding!!.usernameTV.setText(
-                                snapshot.child("name").getValue(
-                                    String::class.java
-                                )
+                            binding!!.usernameTV.text = snapshot.child("name").getValue(
+                                String::class.java
                             )
                         }
 
@@ -202,14 +191,14 @@ class OfferActivity() : AppCompatActivity() {
         storageReferenceImages =
             FirebaseStorage.getInstance().getReference("uploads/offer_images/$offerId")
         storageReferenceImages!!.listAll()
-            .addOnSuccessListener(OnSuccessListener { listResult: ListResult ->
-                for (item: StorageReference in listResult.getItems()) {
+            .addOnSuccessListener { listResult: ListResult ->
+                for (item: StorageReference in listResult.items) {
                     // Получение URL-адреса для каждого изображения и добавление его в список
-                    item.getDownloadUrl().addOnSuccessListener(OnSuccessListener { uri: Uri ->
+                    item.getDownloadUrl().addOnSuccessListener { uri: Uri ->
                         imageUrls!!.add(uri.toString())
                         // Уведомление адаптера об изменениях
                         imageAdapter!!.notifyDataSetChanged()
-                    }).addOnFailureListener(OnFailureListener { e: Exception? ->
+                    }.addOnFailureListener {
                         // Обработка ошибок загрузки изображения
                         Toast.makeText(
                             this@OfferActivity,
@@ -217,9 +206,9 @@ class OfferActivity() : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                         Log.e("OfferActivity", "Ошибка загрузки изображения")
-                    })
+                    }
                 }
-            }).addOnFailureListener(OnFailureListener { e: Exception? ->
+            }.addOnFailureListener {
                 // Обработка ошибок получения списка изображений
                 Toast.makeText(
                     this@OfferActivity,
@@ -227,7 +216,7 @@ class OfferActivity() : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
                 Log.e("OfferActivity", "Ошибка получения списка изображений")
-            })
+            }
 
         val imageScrollContainer: RecyclerView = findViewById(R.id.imageScrollContainer)
         val layoutManager: LinearLayoutManager =
@@ -240,7 +229,7 @@ class OfferActivity() : AppCompatActivity() {
 
     private fun loadUserAvatar(ownerId: String?) {
         storageReferenceAvatar =
-            FirebaseStorage.getInstance().getReference("uploads").child("user_avatars/" + ownerId)
+            FirebaseStorage.getInstance().getReference("uploads").child("user_avatars/$ownerId")
         // Загружаем аватар в виде массива байт
         val ONE_MEGABYTE: Long = (1024 * 1024).toLong()
         storageReferenceAvatar!!.getBytes(ONE_MEGABYTE)
@@ -289,7 +278,7 @@ class OfferActivity() : AppCompatActivity() {
 
         acceptButton.setOnClickListener {
             try {
-                val dialIntent: Intent = Intent(Intent.ACTION_DIAL)
+                val dialIntent = Intent(Intent.ACTION_DIAL)
                 dialIntent.setData(Uri.parse("tel:$ownerPhoneNumber"))
                 startActivity(dialIntent)
             } catch (e: Exception) {
@@ -316,7 +305,7 @@ class OfferActivity() : AppCompatActivity() {
 
         // Удаляем все изображения оффера
         storageReferenceImages.listAll()
-            .addOnSuccessListener(OnSuccessListener { listResult: ListResult ->
+            .addOnSuccessListener { listResult: ListResult ->
                 if (listResult.items.isEmpty()) {
                     // Если нет файлов, сразу удаляем из базы данных
                     deleteFromDatabase(databaseReference, offerId)
@@ -326,27 +315,27 @@ class OfferActivity() : AppCompatActivity() {
                     val totalFiles: Int = listResult.items.size
 
                     for (item: StorageReference in listResult.items) {
-                        item.delete().addOnSuccessListener(OnSuccessListener { aVoid: Void? ->
+                        item.delete().addOnSuccessListener {
                             deleteCount[0]++
                             // Если все файлы удалены, удаляем из базы
                             if (deleteCount[0] == totalFiles) {
                                 deleteFromDatabase(databaseReference, offerId)
                             }
-                        }).addOnFailureListener(OnFailureListener { e: Exception? ->
+                        }.addOnFailureListener { e: Exception? ->
                             Log.e("OfferActivity", "Ошибка удаления файла", e)
                             deleteCount[0]++
                             // Продолжаем и при ошибке удаления файла
                             if (deleteCount[0] == totalFiles) {
                                 deleteFromDatabase(databaseReference, offerId)
                             }
-                        })
+                        }
                     }
                 }
-            }).addOnFailureListener(OnFailureListener { e: Exception? ->
+            }.addOnFailureListener { e: Exception? ->
                 Log.e("OfferActivity", "Ошибка при получении списка файлов", e)
                 // Если не удалось получить список файлов все равно пытаемся удалить
                 deleteFromDatabase(databaseReference, offerId)
-            })
+            }
     }
 
     // Функция для удаления оффера из базы данных
@@ -393,7 +382,7 @@ class OfferActivity() : AppCompatActivity() {
                         // Если да, удаляем его
                         favoritesList.remove(offerId)
                         userRef!!.setValue(favoritesList)
-                            .addOnSuccessListener(OnSuccessListener { aVoid: Void? ->
+                            .addOnSuccessListener {
                                 Toast.makeText(
                                     this@OfferActivity,
                                     "Объявление удалено из избранного",
@@ -401,19 +390,19 @@ class OfferActivity() : AppCompatActivity() {
                                 ).show()
                                 // Обновить кнопку или UI
                                 binding!!.addFavoriteOfferButton.setImageResource(R.drawable.favorite_off_svgrepo_com)
-                            }).addOnFailureListener(OnFailureListener { e: Exception? ->
+                            }.addOnFailureListener { e: Exception? ->
                                 Toast.makeText(
                                     this@OfferActivity,
                                     "Ошибка удаления из избранного",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 Log.e("OfferActivity", "Ошибка удаления из избранного", e)
-                            })
+                            }
                     } else {
                         // Если нет, добавляем его
                         favoritesList.add(offerId)
                         userRef!!.setValue(favoritesList)
-                            .addOnSuccessListener(OnSuccessListener { aVoid: Void? ->
+                            .addOnSuccessListener {
                                 Toast.makeText(
                                     this@OfferActivity,
                                     "Объявление добавлено в избранное",
@@ -421,14 +410,14 @@ class OfferActivity() : AppCompatActivity() {
                                 ).show()
                                 // Обновить кнопку или UI
                                 binding!!.addFavoriteOfferButton.setImageResource(R.drawable.favorite_svgrepo_com)
-                            }).addOnFailureListener(OnFailureListener { e: Exception? ->
+                            }.addOnFailureListener { e: Exception? ->
                                 Toast.makeText(
                                     this@OfferActivity,
                                     "Ошибка добавления в избранное",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 Log.e("OfferActivity", "Ошибка добавления в избранное", e)
-                            })
+                            }
                     }
                 }
 

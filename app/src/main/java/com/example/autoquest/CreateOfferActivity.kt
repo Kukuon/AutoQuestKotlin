@@ -38,7 +38,7 @@ class CreateOfferActivity : AppCompatActivity() {
     private var offerId: String? = null
 
     //  список путей url картинок
-    private val filePaths: MutableList<Uri?>? = ArrayList()
+    private val filePaths: MutableList<Uri?> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
