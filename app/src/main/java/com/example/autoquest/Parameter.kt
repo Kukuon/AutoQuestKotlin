@@ -5,6 +5,8 @@ class Parameter {
     var name: String? = null
     var value: String? = null
 
+
+    // необходимый пустой конструктор
     constructor()
 
     constructor(name: String?, value: String?) {

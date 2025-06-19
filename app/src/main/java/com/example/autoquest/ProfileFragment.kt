@@ -34,113 +34,121 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 
 class ProfileFragment() : Fragment() {
+    // объекты текущего пользователя
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firebaseUser: FirebaseUser? = firebaseAuth.getCurrentUser()
+    private val firebaseUser: FirebaseUser? = firebaseAuth.currentUser
 
+    // объекты firebase storage ссылки
     private var storageReferenceAvatar: StorageReference? = null
     private var userRef: DatabaseReference? = null
 
+    // биндинг разметка
     private var binding: FragmentProfileBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
 
-        if (firebaseUser != null) {
-            storageReferenceAvatar = FirebaseStorage.getInstance().getReference("uploads")
-                .child("user_avatars/" + firebaseUser.getUid())
-            userRef = FirebaseDatabase.getInstance().getReference().child("users")
-                .child(firebaseUser.getUid())
 
+        // если авторизован
+        if (firebaseUser != null) {
+            // получение ссылки на аватарку
+            storageReferenceAvatar = FirebaseStorage.getInstance().getReference("uploads")
+                .child("user_avatars/" + firebaseUser.uid)
+            // получение ссылки на пользователя
+            userRef = FirebaseDatabase.getInstance().getReference().child("users")
+                .child(firebaseUser.uid)
+
+            // загрузка аватара
             updateImageView()
 
+            // загрузка имени из бд
             userRef!!.child("name").addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val name: String? = snapshot.getValue(String::class.java)
                     if (name != null) {
-                        binding!!.usernameTV.setText(name)
+                        binding!!.usernameTV.text = name
                     }
                 }
-
                 override fun onCancelled(error: DatabaseError) {
                     // Обработка ошибок
                 }
             })
 
+            // загрузка номера телефона из бд
             userRef!!.child("phoneNumber").addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val phoneNumber: String? = snapshot.getValue(String::class.java)
                     if (phoneNumber != null) {
-                        binding!!.phoneTV.setText(phoneNumber)
+                        binding!!.phoneTV.text = phoneNumber
                     }
                 }
-
                 override fun onCancelled(error: DatabaseError) {
                     // Обработка ошибок
                 }
             })
 
-            binding!!.emailTV.setText(firebaseUser.getEmail())
-            binding!!.idTV.setText("ID " + firebaseUser.getUid())
+            // установка почты и id в интерфейс
+            binding!!.emailTV.text = firebaseUser.email
+            binding!!.idTV.text = "ID " + firebaseUser.uid
 
-            binding!!.exitButton.setOnClickListener(View.OnClickListener({ v: View? ->
+            // кнопка выхода
+            binding!!.exitButton.setOnClickListener {
                 showConfirmationDialog(
                     "Выйти из аккаунта?",
                     0
                 )
-            }))
+            }
 
-            binding!!.myOffersButton.setOnClickListener(View.OnClickListener({ v: View? ->
+            // кнопка перехода к своим объявлениям
+            binding!!.myOffersButton.setOnClickListener {
                 if (firebaseUser != null) {
-                    startActivity(Intent(getContext(), MyOffersActivity::class.java))
+                    startActivity(Intent(context, MyOffersActivity::class.java))
                 } else {
                     Toast.makeText(
-                        getContext(),
+                        context,
                         "Невозможно открыть объявления",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            }))
+            }
 
-            binding!!.changeNameButton.setOnClickListener(View.OnClickListener({ v: View? ->
-                showChangeDataDialog(
-                    "Изменить имя",
-                    0
-                )
-            }))
-            binding!!.phoneTV.setOnClickListener(View.OnClickListener({ v: View? ->
-                showChangeDataDialog(
-                    "Изменить телефон",
-                    1
-                )
-            }))
-            binding!!.passwordTV.setOnClickListener(View.OnClickListener({ v: View? ->
-                showChangeDataDialog(
-                    "Изменить пароль",
-                    2
-                )
-            }))
+            // кнопки изменения данных пользователя
+            binding!!.changeNameButton.setOnClickListener {
+                showChangeDataDialog("Изменить имя", 0)
+            }
+            binding!!.phoneTV.setOnClickListener {
+                showChangeDataDialog("Изменить телефон", 1)
+            }
+            binding!!.passwordTV.setOnClickListener { showChangeDataDialog(
+                "Изменить пароль", 2
+            )
+            }
 
-            binding!!.avatarImageView.setOnClickListener(View.OnClickListener({ v: View? -> selectImage() }))
+            // нажатие на аватарку дает выбрать новую аватарку
+            binding!!.avatarImageView.setOnClickListener { selectImage() }
 
             return binding!!.getRoot()
         } else {
+            // если пользователь не авторизован то показать экран с кнопкой входа
             val rootView: View = inflater.inflate(R.layout.fragment_unlogged, container, false)
             val goToLoginButton: Button = rootView.findViewById(R.id.goToLoginButton)
-            goToLoginButton.setOnClickListener(View.OnClickListener({ v: View? ->
+            goToLoginButton.setOnClickListener(View.OnClickListener {
                 startActivity(
-                    Intent(getContext(), LoginActivity::class.java)
+                    Intent(context, LoginActivity::class.java)
                 )
-            }))
+            })
             return rootView
         }
     }
 
+
+    // функция выбора изображения
     private fun selectImage() {
-        val intent: Intent = Intent()
+        val intent = Intent()
         intent.setType("image/*")
         intent.setAction(Intent.ACTION_GET_CONTENT)
         startActivityForResult(
@@ -149,43 +157,46 @@ class ProfileFragment() : Fragment() {
         )
     }
 
+    // обновление изображения профиля
     private fun updateImageView() {
         val ONE_MEGABYTE: Long = (1024 * 1024).toLong()
         storageReferenceAvatar!!.getBytes(ONE_MEGABYTE)
-            .addOnSuccessListener(OnSuccessListener({ bytes: ByteArray ->
+            .addOnSuccessListener { bytes: ByteArray ->
                 val bitmap: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 binding!!.avatarImageView.setImageBitmap(bitmap)
-            })).addOnFailureListener(OnFailureListener({ e: Exception? ->
-            Toast.makeText(getContext(), "Ошибка в загрузке фото профиля", Toast.LENGTH_SHORT)
-                .show()
-        }))
+            }.addOnFailureListener {
+                Toast.makeText(context, "Ошибка в загрузке фото профиля", Toast.LENGTH_SHORT)
+                    .show()
+            }
     }
 
+    // обработка результата выбора изображения
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if ((requestCode == PICK_IMAGE_REQUEST) && (resultCode == Activity.RESULT_OK) && (data != null) && (data.getData() != null)) {
-            val filePath: Uri? = data.getData()
+        if ((requestCode == PICK_IMAGE_REQUEST) && (resultCode == Activity.RESULT_OK) && (data != null) && (data.data != null)) {
+            val filePath: Uri? = data.data
             if (filePath != null) {
                 storageReferenceAvatar!!.putFile(filePath)
-                    .addOnSuccessListener(OnSuccessListener({ taskSnapshot: UploadTask.TaskSnapshot? ->
+                    .addOnSuccessListener {
                         Toast.makeText(
-                            getActivity(),
+                            activity,
                             "Изображение успешно загружено",
                             Toast.LENGTH_SHORT
                         ).show()
                         updateImageView()
-                    }))
-                    .addOnFailureListener(OnFailureListener({ e: Exception ->
+                    }
+                    .addOnFailureListener { e: Exception ->
                         Toast.makeText(
-                            getActivity(),
+                            activity,
                             "Ошибка загрузки изображения: " + e.message,
                             Toast.LENGTH_SHORT
                         ).show()
-                    }))
+                    }
             }
         }
     }
 
+    // диалог подветрждения действия удаления и выхода
     private fun showConfirmationDialog(parameterName: String, mode: Int) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
         val inflater: LayoutInflater = this.getLayoutInflater()
@@ -193,22 +204,23 @@ class ProfileFragment() : Fragment() {
         builder.setView(dialogView)
 
         val title: TextView = dialogView.findViewById(R.id.dialog_title)
-        title.setText(parameterName)
+        title.text = parameterName
 
         val acceptButton: ImageButton = dialogView.findViewById(R.id.acceptButton)
         val cancelButton: ImageButton = dialogView.findViewById(R.id.cancelButton)
 
         val dialog: AlertDialog = builder.create()
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow()!!.setBackgroundDrawableResource(android.R.color.transparent)
+        if (dialog.window != null) {
+            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
-        acceptButton.setOnClickListener(View.OnClickListener { v: View? ->
+        acceptButton.setOnClickListener { v: View? ->
             if (firebaseUser != null) {
-                val intent: Intent = getActivity()!!.getIntent()
+                val intent: Intent = getActivity()!!.intent
                 when (mode) {
                     0 -> {
+                        // выход из профиля
                         firebaseAuth.signOut()
                         dialog.dismiss()
                         getActivity()!!.finish()
@@ -216,55 +228,65 @@ class ProfileFragment() : Fragment() {
                     }
 
                     1 -> userRef!!.removeValue()
-                        .addOnSuccessListener(OnSuccessListener { unused: Void? ->
-                            storageReferenceAvatar!!.delete().addOnSuccessListener(
-                                OnSuccessListener { avoid: Void? ->
-                                    firebaseUser.delete().addOnSuccessListener(
-                                        OnSuccessListener { unused1: Void? ->
-                                            requireActivity().finish()
-                                            startActivity(intent)
-                                        }
-                                    )
+                            // удаление аккаунта
+                        .addOnSuccessListener {
+                            storageReferenceAvatar!!.delete().addOnSuccessListener {
+                                firebaseUser.delete().addOnSuccessListener {
+                                    requireActivity().finish()
+                                    startActivity(intent)
                                 }
-                            )
-                        })
+                            }
+                        }
                 }
             }
-        })
+        }
 
-        cancelButton.setOnClickListener(View.OnClickListener({ v: View? -> dialog.dismiss() }))
+        // кнопка отмены диалога
+        cancelButton.setOnClickListener { dialog.dismiss() }
+        // показ диалога
         dialog.show()
     }
 
+    // диалог изменения данных имени телефона и пароля
     private fun showChangeDataDialog(parameterName: String, mode: Int) {
+        // билдер диалога
         val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        // layout для диалога
         val inflater: LayoutInflater = this.getLayoutInflater()
         val dialogView: View = inflater.inflate(R.layout.dialog_change_data, null)
         builder.setView(dialogView)
 
+        // привязка макета к объектам
         val title: TextView = dialogView.findViewById(R.id.dialogTitle)
         val editText: EditText = dialogView.findViewById(R.id.newDataInput)
         val saveButton: Button = dialogView.findViewById(R.id.saveButton)
 
-        title.setText(parameterName)
 
+        // заголовок диалога
+        title.text = parameterName
+
+
+        // создание диалога
         val dialog: AlertDialog = builder.create()
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow()!!.setBackgroundDrawableResource(android.R.color.transparent)
+        if (dialog.window != null) {
+            dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
-        saveButton.setOnClickListener(View.OnClickListener { v: View? ->
-            val newData: String = editText.getText().toString()
+        // кнопка сохранения изменений
+        saveButton.setOnClickListener {
+            val newData: String = editText.text.toString()
+            // пользователь авторизован
             if (firebaseUser != null) {
-                if (!newData.isEmpty()) {
+                if (newData.isNotEmpty()) {
                     when (mode) {
+                        // смена имения
                         0 -> userRef!!.child("name").setValue(newData)
-                            .addOnCompleteListener(OnCompleteListener { task: Task<Void?> ->
-                                if (task.isSuccessful()) {
+                            .addOnCompleteListener { task: Task<Void?> ->
+                                if (task.isSuccessful) {
                                     Toast.makeText(
                                         requireContext(),
-                                        "Имя изменено на " + newData,
+                                        "Имя изменено на $newData",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
@@ -275,14 +297,14 @@ class ProfileFragment() : Fragment() {
                                     ).show()
                                 }
                                 dialog.dismiss()
-                            })
-
+                            }
+                        // смена телеофна
                         1 -> userRef!!.child("phoneNumber").setValue(newData)
-                            .addOnCompleteListener(OnCompleteListener { task: Task<Void?> ->
-                                if (task.isSuccessful()) {
+                            .addOnCompleteListener { task: Task<Void?> ->
+                                if (task.isSuccessful) {
                                     Toast.makeText(
                                         requireContext(),
-                                        "Телефон изменен на " + newData,
+                                        "Телефон изменен на $newData",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
@@ -293,14 +315,15 @@ class ProfileFragment() : Fragment() {
                                     ).show()
                                 }
                                 dialog.dismiss()
-                            })
+                            }
 
+                        // смена пароля
                         2 -> firebaseUser.updatePassword(newData)
-                            .addOnCompleteListener(OnCompleteListener { task: Task<Void?> ->
-                                if (task.isSuccessful()) {
+                            .addOnCompleteListener { task: Task<Void?> ->
+                                if (task.isSuccessful) {
                                     Log.d("UpdatePassword", "User password updated.")
                                     Toast.makeText(
-                                        getContext(),
+                                        context,
                                         "Пароль успешно изменен",
                                         Toast.LENGTH_SHORT
                                     ).show()
@@ -308,26 +331,27 @@ class ProfileFragment() : Fragment() {
                                     Log.d(
                                         "UpdatePassword",
                                         "Error password not updated.",
-                                        task.getException()
+                                        task.exception
                                     )
                                     Toast.makeText(
-                                        getContext(),
+                                        context,
                                         "Ошибка при изменении пароля",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
                                 dialog.dismiss()
-                            })
+                            }
                     }
                 } else {
-                    editText.setError("Поле ввода должно быть заполнено")
+                    editText.error = "Поле ввода должно быть заполнено"
                 }
             }
-        })
+        }
+        // показ диалога
         dialog.show()
     }
 
     companion object {
-        private val PICK_IMAGE_REQUEST: Int = 22
+        private const val PICK_IMAGE_REQUEST: Int = 22
     }
 }

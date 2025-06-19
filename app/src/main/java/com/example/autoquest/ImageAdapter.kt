@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.autoquest.ImageAdapter.ImageViewHolder
 import com.google.firebase.storage.FirebaseStorage
 
+
+// адаптер для картинкок оффера
 class ImageAdapter(private val context: Context, private val imageUrls: List<String>?) :
     RecyclerView.Adapter<ImageViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -43,7 +45,6 @@ class ImageAdapter(private val context: Context, private val imageUrls: List<Str
                 var bitmap: Bitmap? = null
                 val task = storageReference.getBytes(ONE_MEGABYTE)
 
-                // Ждём результат синхронно — неэффективно, но работает с AsyncTask
                 val bytes = com.google.android.gms.tasks.Tasks.await(task)
                 bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 

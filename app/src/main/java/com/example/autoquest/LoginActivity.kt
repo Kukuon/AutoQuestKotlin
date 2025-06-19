@@ -31,54 +31,61 @@ class LoginActivity() : AppCompatActivity() {
 
         binding!!.acceptButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View) {
+
                 val email = emailInput.text.toString()
                 val password = passwordInput.text.toString()
-                if (!email.isEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    if (!password.isEmpty()) {
+
+                // вход
+                // проверка почты на правильность
+                if (email.isNotEmpty() && Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    if (password.isNotEmpty()) {
                         firebaseAuth.signInWithEmailAndPassword(email, password)
-                            .addOnSuccessListener(
-                                OnSuccessListener {
-                                    Toast.makeText(
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Успешный вход " + firebaseAuth.currentUser!!
+                                        .email,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                startActivity(
+                                    Intent(
                                         this@LoginActivity,
-                                        "Успешный вход " + firebaseAuth.currentUser!!
-                                            .email,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    startActivity(
-                                        Intent(
-                                            this@LoginActivity,
-                                            MainActivity::class.java
-                                        )
+                                        MainActivity::class.java
                                     )
-                                    finish()
-                                }).addOnFailureListener(object : OnFailureListener {
-                            override fun onFailure(e: Exception) {
+                                )
+                                finish()
+                            }.addOnFailureListener {
                                 Toast.makeText(
                                     this@LoginActivity,
                                     "Не удалось войти",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                        })
                     } else {
+                        // пустой пароль
                         passwordInput.error = "Пароль не может быть пустым"
                     }
                 } else if (email.isEmpty()) {
+                    // пустая почта
                     emailInput.error = "Почта не может быть пустой"
                 } else {
+                    // почта неправильная
                     emailInput.error = "Пожалуйста, введите почту правильно"
                 }
             }
         })
-        binding!!.continueWithoutAccountButton.setOnClickListener { v: View? ->
+        // кнопка продолжить без аккаунта
+        binding!!.continueWithoutAccountButton.setOnClickListener {
             startActivity(
                 Intent(
                     this@LoginActivity, MainActivity::class.java
                 )
             )
         }
-        binding!!.resetPasswordButton.setOnClickListener { v: View? -> showDialogResetPassword() }
-        binding!!.signupButton.setOnClickListener { v: View? ->
+        // кнопка сброса пароля
+        binding!!.resetPasswordButton.setOnClickListener { showDialogResetPassword() }
+        // кнопка перехода на регистрацию
+        binding!!.signupButton.setOnClickListener {
             startActivity(
                 Intent(
                     this@LoginActivity, SignUpActivity::class.java
@@ -87,21 +94,26 @@ class LoginActivity() : AppCompatActivity() {
         }
     }
 
+
+    // диалог сброса пароля
     private fun showDialogResetPassword() {
-        // Создаем билдер для AlertDialog
+        // билдер для AlertDialog
         val builder = AlertDialog.Builder(this)
 
-        // Получаем LayoutInflater
+        // получаем LayoutInflater
         val inflater = this.layoutInflater
 
-        // Создаем View для диалогового окна из пользовательского макета
+        // создаем view для диалогового окна из пользовательского макета
         val dialogView = inflater.inflate(R.layout.dialog_change_data, null)
+        // установка view билдеру
         builder.setView(dialogView)
 
+        // привязка макета к объектам
         val title = dialogView.findViewById<TextView>(R.id.dialogTitle)
         val acceptButton = dialogView.findViewById<Button>(R.id.saveButton)
         val editText = dialogView.findViewById<EditText>(R.id.newDataInput)
 
+        // установка текста
         title.text = "Восстановление пароля"
         editText.hint = "E-mail"
         editText.setCompoundDrawablesWithIntrinsicBounds(
@@ -112,11 +124,13 @@ class LoginActivity() : AppCompatActivity() {
         )
         acceptButton.text = "Отправить"
 
+        // создание диалога
         val dialog = builder.create()
         if (dialog.window != null) {
             dialog.window!!.setBackgroundDrawableResource(android.R.color.transparent)
         }
 
+        // кнопка подтверждения
         acceptButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View) {
                 val email = editText.text.toString().trim { it <= ' ' }
@@ -126,28 +140,28 @@ class LoginActivity() : AppCompatActivity() {
                     return
                 }
 
+                // отправка сброса пароля на почту
                 firebaseAuth.sendPasswordResetEmail(email)
-                    .addOnCompleteListener(object : OnCompleteListener<Void?> {
-                        override fun onComplete(task: Task<Void?>) {
-                            if (task.isSuccessful) {
-                                Toast.makeText(
-                                    this@LoginActivity,
-                                    "Инструкции по восстановлению пароля отправлены на ваш email",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                dialog.dismiss()
-                            } else {
-                                Toast.makeText(
-                                    this@LoginActivity,
-                                    "Ошибка отправки инструкции по восстановлению пароля",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                dialog.dismiss()
-                            }
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Инструкции по восстановлению пароля отправлены на ваш email",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            dialog.dismiss()
+                        } else {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Ошибка отправки инструкции по восстановлению пароля",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            dialog.dismiss()
                         }
-                    })
+                    }
             }
         })
+        // показ диалога
         dialog.show()
     }
 }

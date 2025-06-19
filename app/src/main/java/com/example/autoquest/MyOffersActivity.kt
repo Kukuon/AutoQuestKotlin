@@ -37,6 +37,7 @@ class MyOffersActivity() : AppCompatActivity() {
             val userId: String = currentUser.uid
             val offersRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("offers")
 
+            // получение списка офферов текущего пользователя
             offersRef.orderByChild("ownerId").equalTo(userId)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     @SuppressLint("NotifyDataSetChanged")
@@ -50,7 +51,7 @@ class MyOffersActivity() : AppCompatActivity() {
                             }
 
                         }
-                        gridAdapter!!.notifyDataSetChanged() // Обновляем адаптер
+                        gridAdapter!!.notifyDataSetChanged() // обновляем адаптер
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
@@ -62,7 +63,7 @@ class MyOffersActivity() : AppCompatActivity() {
                     }
                 })
         }
-
-        binding!!.returnButton.setOnClickListener(View.OnClickListener { v: View? -> finish() }) // Просто закрываем активити
+// просто закрываем активити
+        binding!!.returnButton.setOnClickListener { finish() }
     }
 }

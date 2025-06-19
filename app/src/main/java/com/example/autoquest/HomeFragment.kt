@@ -19,9 +19,12 @@ import com.google.firebase.database.ValueEventListener
 class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
 
+    // объекты firebase
     private val databaseReference = FirebaseDatabase.getInstance().getReference("offers")
+    // объект авторизации текущего пользователя
     private val firebaseUser = FirebaseAuth.getInstance().currentUser
 
+    // объект адаптера грида
     private var gridAdapter: GridAdapter? = null
     private val offerList: MutableList<Offer> = ArrayList()
 

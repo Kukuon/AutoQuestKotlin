@@ -10,40 +10,33 @@ import android.widget.ImageView
 
 class AvatarAdapter(private val mContext: Context, private val mBitmaps: List<Bitmap>) :
     BaseAdapter() {
-        // колво элементов списка
+
     override fun getCount(): Int {
         return mBitmaps.size
     }
 
-    // позиция объяекта в списке
     override fun getItem(position: Int): Any {
         return mBitmaps[position]
     }
-// id элемента
+
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
 
-    // получение view
-    override fun getView(position: Int, convertView: View, parent: ViewGroup): View {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val imageView: ImageView
 
         if (convertView == null) {
-            // если нет уже view, то делается новый
-            val inflater =
-                mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             imageView = ImageView(mContext)
-            // размеры картинки 250
-            imageView.layoutParams =
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    250
-                ) // установка скейла
+            imageView.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                250
+            )
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         } else {
             imageView = convertView as ImageView
         }
-    // установка картинки в imageView
+
         imageView.setImageBitmap(mBitmaps[position])
         return imageView
     }

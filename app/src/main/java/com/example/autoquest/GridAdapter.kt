@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ListResult
 
+// адаптер для элемента грида
 class GridAdapter(private val context: Context?, private var offerList: MutableList<Offer>) :
     RecyclerView.Adapter<GridAdapter.ViewHolder>() {
     fun clear() {
@@ -37,6 +38,7 @@ class GridAdapter(private val context: Context?, private var offerList: MutableL
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val offer = offerList[position]
+
 
         holder.textViewTitle.text = offer.brand + " " + offer.model + " " + offer.generation
         holder.textViewPrice.text = offer.price + " P"
@@ -79,12 +81,15 @@ class GridAdapter(private val context: Context?, private var offerList: MutableL
         return offerList.size
     }
 
+    // обновление грида офферов
     fun updateOffers(offers: List<Offer>?) {
         offerList.clear()
         offerList.addAll(offers!!)
         notifyDataSetChanged()
     }
 
+
+    // привязка макета к объектам
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var textViewTitle: TextView = itemView.findViewById(R.id.titleTV)
         var textViewPrice: TextView = itemView.findViewById(R.id.priceTV)

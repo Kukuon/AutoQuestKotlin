@@ -18,7 +18,9 @@ class MainActivity() : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.getRoot())
 
-        binding!!.bottomBar.setOnItemSelectedListener(NavigationBarView.OnItemSelectedListener { item: MenuItem ->
+
+        // переключение фрагментов
+        binding!!.bottomBar.setOnItemSelectedListener { item: MenuItem ->
             if (item.itemId == R.id.search) {
                 replaceFragment(SearchFragment())
             } else if (item.itemId == R.id.favorites) {
@@ -31,7 +33,8 @@ class MainActivity() : AppCompatActivity() {
                 replaceFragment(ProfileFragment())
             }
             true
-        })
+        }
+        // уставнока кнопки home по умолчанию при открытии приложения
         binding!!.bottomBar.setSelectedItemId(R.id.home)
         replaceFragment(HomeFragment())
     }
@@ -40,6 +43,7 @@ class MainActivity() : AppCompatActivity() {
         super.onPause()
     }
 
+    // функция переключения фрагмента
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()

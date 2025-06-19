@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 
+
+//адаптер для отдельного параметра оффера
 class ParameterAdapter(private val context: Context, private val parameters: List<Parameter>) :
     BaseAdapter() {
     override fun getCount(): Int {
