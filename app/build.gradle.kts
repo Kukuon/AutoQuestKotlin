@@ -64,6 +64,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database:21.0.0")
     implementation("com.google.firebase:firebase-storage:21.0.0")
     implementation("com.google.firebase:firebase-messaging:24.0.0")
+    implementation ("com.google.firebase:firebase-database-ktx")
+
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 

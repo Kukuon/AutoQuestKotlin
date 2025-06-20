@@ -91,7 +91,7 @@ class CreateOfferActivity : AppCompatActivity() {
                 for (i in 0 until count) {
                     val imageUri = data.clipData!!.getItemAt(i).uri
                     // добавляем Uri в список
-                    filePaths!!.add(imageUri)
+                    filePaths.add(imageUri)
                     try {
                         // получаем Bitmap для отображения превью
                         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
@@ -103,7 +103,7 @@ class CreateOfferActivity : AppCompatActivity() {
                 // если выбрано одно изображение
             } else if (data.data != null) {
                 val imageUri = data.data
-                filePaths!!.add(imageUri)
+                filePaths.add(imageUri)
                 try {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
                     bitmaps.add(bitmap)
@@ -136,7 +136,7 @@ class CreateOfferActivity : AppCompatActivity() {
                     "offer_images/" + offerId + "/" + UUID.randomUUID().toString()
                 )
                 // загрузка и слушаем результат
-                ref.putFile(uri!!).addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot? ->
+                ref.putFile(uri!!).addOnSuccessListener {
 
                     progressDialog.dismiss()
                     Toast.makeText(
@@ -180,9 +180,7 @@ class CreateOfferActivity : AppCompatActivity() {
         // получаем телефон владельца из базы чтобы добавить в объявление
         usersRef!!.child(ownerId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val ownerPhoneNumber = snapshot.child("phoneNumber").getValue(
-                    String::class.java
-                )
+                val ownerPhoneNumber = snapshot.child("phoneNumber").value.toString()
                 val item = Offer(
                     offerId,
                     brand,

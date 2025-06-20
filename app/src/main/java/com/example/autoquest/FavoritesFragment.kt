@@ -16,9 +16,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 class FavoritesFragment : Fragment() {
-    var binding: FragmentFavoritesBinding? = null
+    private var binding: FragmentFavoritesBinding? = null
 
     private val firebaseUser = FirebaseAuth.getInstance().currentUser
 
@@ -49,7 +50,7 @@ class FavoritesFragment : Fragment() {
             val rootView = inflater.inflate(R.layout.fragment_unlogged, container, false)
             val goToLoginButton = rootView.findViewById<Button>(R.id.goToLoginButton)
 
-            goToLoginButton.setOnClickListener { v: View? ->
+            goToLoginButton.setOnClickListener {
                 startActivity(
                     Intent(
                         context, LoginActivity::class.java
@@ -96,7 +97,7 @@ class FavoritesFragment : Fragment() {
             databaseReferenceOffers.child(offerId)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val offer = snapshot.getValue(Offer::class.java)
+                        val offer = snapshot.getValue<Offer>()
                         if (offer != null) {
                             offer.offerId = snapshot.key
                             favoriteOfferList.add(offer)

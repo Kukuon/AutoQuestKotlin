@@ -17,8 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.autoquest.databinding.ActivityOfferBinding
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -88,36 +86,17 @@ class OfferActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     // получаем параметры из снимка данных
-                    val brand: String? = snapshot.child("brand").getValue(
-                        String::class.java
-                    )
-                    val model: String? = snapshot.child("model").getValue(
-                        String::class.java
-                    )
-                    val generation: String? = snapshot.child("generation").getValue(
-                        String::class.java
-                    )
-                    val price: String? = snapshot.child("price").getValue(
-                        String::class.java
-                    )
-                    val year: String? = snapshot.child("year").getValue(
-                        String::class.java
-                    )
-                    val description: String? = snapshot.child("description").getValue(
-                        String::class.java
-                    )
-                    val enginePower: String? = snapshot.child("enginePower").getValue(
-                        String::class.java
-                    )
-                    val fuelConsumption: String? = snapshot.child("fuelConsumption").getValue(
-                        String::class.java
-                    )
-                    ownerPhoneNumber = snapshot.child("ownerPhoneNumber").getValue(
-                        String::class.java
-                    )
-                    val ownerId: String? = snapshot.child("ownerId").getValue(
-                        String::class.java
-                    )
+                    val brand: String = snapshot.child("brand").value.toString()
+
+                    val model: String = snapshot.child("model").value.toString()
+                    val generation: String = snapshot.child("generation").value.toString()
+                    val price: String = snapshot.child("price").value.toString()
+                    val year: String = snapshot.child("year").value.toString()
+                    val description: String = snapshot.child("description").value.toString()
+                    val enginePower: String = snapshot.child("enginePower").value.toString()
+                    val fuelConsumption: String = snapshot.child("fuelConsumption").value.toString()
+                    ownerPhoneNumber = snapshot.child("ownerPhoneNumber").value.toString()
+                    val ownerId: String = snapshot.child("ownerId").value.toString()
 
                     val parameters: MutableList<Parameter> = ArrayList()
 
@@ -133,18 +112,16 @@ class OfferActivity : AppCompatActivity() {
                     parameters.add(Parameter("Расход топлива", fuelConsumption))
 
                     // привязка текста к соответсвующим textView
-                    binding!!.titleTV.text = brand + " " + model + " " + generation
-                    binding!!.priceTV.text = price + " ₽"
+                    binding!!.titleTV.text = "$brand $model $generation"
+                    binding!!.priceTV.text = "$price ₽"
                     binding!!.descriptionTV.text = description
 
                     // установка имени пользователя в объявлении, взтого из firebae databse
                     userRef =
-                        FirebaseDatabase.getInstance().getReference("users").child((ownerId)!!)
+                        FirebaseDatabase.getInstance().getReference("users").child((ownerId))
                     userRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            binding!!.usernameTV.text = snapshot.child("name").getValue(
-                                String::class.java
-                            )
+                            binding!!.usernameTV.text = snapshot.child("name").value.toString()
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -156,8 +133,8 @@ class OfferActivity : AppCompatActivity() {
                             .child(firebaseUser.uid)
                         userRef1!!.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
-                                isAdmin = snapshot.child("isAdmin").getValue(String::class.java)
-                                if (isAdmin != null && (isAdmin == "true")) {
+                                isAdmin = snapshot.child("isAdmin").value.toString()
+                                if (isAdmin == "true") {
                                     binding!!.deleteOfferButton.visibility = View.VISIBLE
                                 }
                             }
@@ -219,7 +196,7 @@ class OfferActivity : AppCompatActivity() {
             }
 
         val imageScrollContainer: RecyclerView = findViewById(R.id.imageScrollContainer)
-        val layoutManager: LinearLayoutManager =
+        val layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         imageScrollContainer.setLayoutManager(layoutManager)
         imageAdapter = ImageAdapter(this, imageUrls)
@@ -370,9 +347,7 @@ class OfferActivity : AppCompatActivity() {
                     val favoritesList: MutableList<String?> = ArrayList()
                     if (snapshot.exists()) {
                         for (favoriteSnapshot: DataSnapshot in snapshot.getChildren()) {
-                            val favoriteOfferId: String? = favoriteSnapshot.getValue(
-                                String::class.java
-                            )
+                            val favoriteOfferId: String = favoriteSnapshot.value.toString()
                             favoritesList.add(favoriteOfferId)
                         }
                     }

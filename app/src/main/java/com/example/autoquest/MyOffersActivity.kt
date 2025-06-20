@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 class MyOffersActivity : AppCompatActivity() {
     private val currentUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
@@ -44,7 +45,7 @@ class MyOffersActivity : AppCompatActivity() {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         (userOffers as ArrayList<Offer>).clear()
                         for (offerSnapshot: DataSnapshot in dataSnapshot.getChildren()) {
-                            val offer: Offer? = offerSnapshot.getValue(Offer::class.java)
+                            val offer: Offer? = offerSnapshot.getValue<Offer>()
                             if (offer != null) {
                                 offer.offerId = offerSnapshot.key
                                 (userOffers as ArrayList<Offer>).add(offer)

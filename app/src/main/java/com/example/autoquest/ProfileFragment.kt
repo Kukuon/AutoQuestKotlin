@@ -18,9 +18,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.autoquest.databinding.FragmentProfileBinding
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -31,7 +28,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 
 class ProfileFragment : Fragment() {
     // объекты текущего пользователя
@@ -68,10 +64,8 @@ class ProfileFragment : Fragment() {
             // загрузка имени из бд
             userRef!!.child("name").addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val name: String? = snapshot.getValue(String::class.java)
-                    if (name != null) {
-                        binding!!.usernameTV.text = name
-                    }
+                    val name: String = snapshot.value.toString()
+                    binding!!.usernameTV.text = name
                 }
                 override fun onCancelled(error: DatabaseError) {
                     // Обработка ошибок
@@ -81,10 +75,8 @@ class ProfileFragment : Fragment() {
             // загрузка номера телефона из бд
             userRef!!.child("phoneNumber").addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val phoneNumber: String? = snapshot.getValue(String::class.java)
-                    if (phoneNumber != null) {
-                        binding!!.phoneTV.text = phoneNumber
-                    }
+                    val phoneNumber: String = snapshot.value.toString()
+                    binding!!.phoneTV.text = phoneNumber
                 }
                 override fun onCancelled(error: DatabaseError) {
                     // Обработка ошибок
@@ -105,15 +97,7 @@ class ProfileFragment : Fragment() {
 
             // кнопка перехода к своим объявлениям
             binding!!.myOffersButton.setOnClickListener {
-                if (firebaseUser != null) {
-                    startActivity(Intent(context, MyOffersActivity::class.java))
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Невозможно открыть объявления",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                startActivity(Intent(context, MyOffersActivity::class.java))
             }
 
             // кнопки изменения данных пользователя
@@ -136,11 +120,11 @@ class ProfileFragment : Fragment() {
             // если пользователь не авторизован то показать экран с кнопкой входа
             val rootView: View = inflater.inflate(R.layout.fragment_unlogged, container, false)
             val goToLoginButton: Button = rootView.findViewById(R.id.goToLoginButton)
-            goToLoginButton.setOnClickListener(View.OnClickListener {
+            goToLoginButton.setOnClickListener {
                 startActivity(
                     Intent(context, LoginActivity::class.java)
                 )
-            })
+            }
             return rootView
         }
     }

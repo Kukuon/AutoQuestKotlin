@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import java.util.Locale
 
 class SearchFragment : Fragment() {
@@ -28,7 +29,7 @@ class SearchFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.fragment_search, container, false)
 
         val searchView: SearchView = view.findViewById(R.id.searchView)
@@ -64,7 +65,7 @@ class SearchFragment : Fragment() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 offerList.clear()
                 for (snapshot: DataSnapshot in dataSnapshot.getChildren()) {
-                    val offer: Offer? = snapshot.getValue(Offer::class.java)
+                    val offer: Offer? = snapshot.getValue<Offer>()
                     if (offer != null) {
                         offer.offerId = snapshot.key;
                         offerList.add(offer)

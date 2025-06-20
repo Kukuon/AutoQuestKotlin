@@ -6,15 +6,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.autoquest.databinding.ActivitySignupBinding
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -23,9 +17,8 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
+
 import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -168,7 +161,7 @@ class SignUpActivity : AppCompatActivity() {
         if (filePath != null) {
             // прогрессбар
 
-            val progressDialog: ProgressDialog = ProgressDialog(this)
+            val progressDialog = ProgressDialog(this)
             progressDialog.setTitle("Uploading...")
             progressDialog.show()
 
@@ -181,7 +174,7 @@ class SignUpActivity : AppCompatActivity() {
                     progressDialog.dismiss()
                     Toast.makeText(this@SignUpActivity, "Image Uploaded!!", Toast.LENGTH_SHORT)
                         .show()
-                }.addOnFailureListener { e -> // Error, Image not uploaded
+                }.addOnFailureListener { e ->
                     progressDialog.dismiss()
                     Toast.makeText(this@SignUpActivity, "Failed " + e.message, Toast.LENGTH_SHORT)
                         .show()
@@ -210,12 +203,8 @@ class SignUpActivity : AppCompatActivity() {
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val phoneNumber: String? = snapshot.child("phoneNumber").getValue(
-                        String::class.java
-                    )
-                    val name: String? = snapshot.child("name").getValue(
-                        String::class.java
-                    )
+                    val phoneNumber: String = snapshot.child("phoneNumber").value.toString()
+                    val name: String = snapshot.child("name").value.toString()
                 }
             }
 

@@ -15,6 +15,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 class HomeFragment : Fragment() {
     private var binding: FragmentHomeBinding? = null
@@ -30,7 +31,7 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         gridAdapter = GridAdapter(activity, ArrayList())
         binding!!.gridOffers.layoutManager = GridLayoutManager(context, 2)
@@ -59,7 +60,7 @@ class HomeFragment : Fragment() {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (snapshot in dataSnapshot.children) {
-                    val offer = snapshot.getValue(Offer::class.java)
+                    val offer = snapshot.getValue<Offer>()
                     if (offer != null) {
                         offer.offerId = snapshot.key // Используем ключ узла как ID
                         offerList.add(offer)

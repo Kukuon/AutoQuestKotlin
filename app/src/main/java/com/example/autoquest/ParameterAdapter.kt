@@ -16,7 +16,7 @@ class ParameterAdapter(private val context: Context, private val parameters: Lis
     }
 
     override fun getItem(position: Int): Any {
-        return parameters.get(position)
+        return parameters[position]
     }
 
     override fun getItemId(position: Int): Long {
